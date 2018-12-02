@@ -44,22 +44,6 @@ def dt2BSEURL(givenDate):
 	bseZipURL="https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_"+dateBSE+".zip"
 	return bseZipURL;
 
-### Saturday,Sunday logic
-# curF2year=reqF2Date.strftime("%Y")
-# curF2month=reqF2Date.strftime("%b").upper()
-# curF1year=reqF1Date.strftime("%Y")
-# curF1month=reqF1Date.strftime("%b").upper()
-# if reqF2Date.isoweekday() == 6 or reqF2Date.isoweekday() == 7:
-# 	curF2weekday=reqF2Date.isoweekday()
-# 	latestF2date=reqF2Date-datetime.timedelta(days=curF2weekday-5)
-# else:
-# 	latestF2date=reqF2Date
-# if reqF1Date.isoweekday() == 6 or reqF1Date.isoweekday() == 7:
-# 	curF1weekday=reqF1Date.isoweekday()
-# 	latestF1date=reqF1Date-datetime.timedelta(days=curF1weekday-5)
-# else:
-# 	latestF1date=reqF1Date	
-
 ### Setting Filenames to be downloaded
 dtF22=latestWeekdayDate(givenF2Date)
 dtF11=latestWeekdayDate(givenF1Date)
@@ -84,52 +68,6 @@ elif xvx[2] == 'n':
 	F1ZipURL=dt2NSEURL(dtF11)
 	F1ZIPFile=data_path+"cm"+latestF1date+"bhav.csv.zip"
 	F1CsvFile=F1ZIPFile.replace(".zip","")
-
-# if xvx == 'bvb':
-# 	latestF2date=dt2BSEdt(dtF22)
-# 	F2ZipURL=dt2BSEURL(dtF22)
-# 	F2ZIPFile=data_path+"EQ_ISINCODE_"+latestF2date+".zip"
-# 	F2CsvFile=F2ZIPFile.replace(".zip","")
-# 	latestF1date=dt2BSEdt(dtF11)
-# 	F1ZipURL=dt2BSEURL(dtF11)
-# 	F1ZIPFile=data_path+"EQ_ISINCODE_"+latestF1date+".zip"
-# 	F1CsvFile=F1ZIPFile.replace(".zip","")
-# elif xvx == 'bvn':
-# 	latestF2date=dt2BSEdt(dtF22)
-# 	F2ZipURL=dt2BSEURL(dtF22)
-# 	F2ZIPFile=data_path+"EQ_ISINCODE_"+latestF2date+".zip"
-# 	F2CsvFile=F2ZIPFile.replace(".zip","")
-# 	latestF1date=dt2NSEdt(dtF11)
-# 	F1ZipURL=dt2NSEURL(dtF11)
-# 	F1ZIPFile=data_path+"cm"+latestF1date+"bhav.csv.zip"
-# 	F1CsvFile=F1ZIPFile.replace(".zip","")
-# elif xvx == 'nvn':
-# 	latestF2date=dt2NSEdt(dtF22)
-# 	F2ZipURL=dt2NSEURL(dtF22)
-# 	F2ZIPFile=data_path+"cm"+latestF2date+"bhav.csv.zip"
-# 	F2CsvFile=F2ZIPFile.replace(".zip","")
-# 	latestF1date=dt2NSEdt(dtF11)
-# 	F1ZipURL=dt2NSEURL(dtF11)
-# 	F1ZIPFile=data_path+"cm"+latestF1date+"bhav.csv.zip"
-# 	F1CsvFile=F1ZIPFile.replace(".zip","")
-# elif xvx == 'nvb':
-# 	latestF2date=dt2NSEdt(dtF22)
-# 	F2ZipURL=dt2NSEURL(dtF22)
-# 	F2ZIPFile=data_path+"cm"+latestF2date+"bhav.csv.zip"
-# 	F2CsvFile=F2ZIPFile.replace(".zip","")
-# 	latestF1date=dt2BSEdt(dtF11)
-# 	F1ZipURL=dt2BSEURL(dtF11)
-# 	F1ZIPFile=data_path+"EQ_ISINCODE_"+latestF1date+".zip"
-# 	F1CsvFile=F1ZIPFile.replace(".zip","")
-	
-# dateNSE=latest_date.strftime("%d%b%Y").upper()
-# dateBSE=latest_date.strftime("%d%m%y")
-# nseZipURL="https://www.nseindia.com/content/historical/EQUITIES/"+cur_year+"/"+cur_month+"/cm"+dateNSE+"bhav.csv.zip"
-# bseZipURL="https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_"+dateBSE+".zip"
-# NSEZIPFile=data_path+"cm"+dateNSE+"bhav.csv.zip"
-# BSEZIPFile=data_path+"EQ_ISINCODE_"+dateBSE+".zip"
-# NSECsvFile=NSEZIPFile.replace(".zip","")
-# BSECsvFile=BSEZIPFile.replace(".zip","")
 
 ### Download files
 r = requests.get(F2ZipURL, stream = True)
