@@ -36,18 +36,7 @@ if lookupColFile1 == '' or lookupColFile2 == '':
 	print("LookupCol not found in files")
 	sys.exit()
 
-#---------------------------- Finding Index for Output Columns in file1
-outputColmnIndexListfile1 = []
-for outCol in outputColumns:
-	colmnInd=0
-	for headers in colHeadersfile1:
-		if outCol == headers:
-			outputColmnIndexListfile1.append(colmnInd)
-		colmnInd=colmnInd+1
-if len(outputColmnIndexListfile1)==0:
-	print("Output Columns not found in file1")
-	sys.exit()
-
+#---------------------------- Finding Index for Output Columns in file
 for colmn in outputColumns:
 	if not(colmn in colHeadersfile1):
 		print("Columns "+colmn+" not found in file1")
@@ -59,4 +48,5 @@ print(outputColumns)
 #---------------------------- Left Join of df2 with df1
 dfJoined=df2.join(df1[outputColumns].set_index(lookupColFile1),how='inner', on=lookupColFile2,lsuffix='_2', rsuffix='_1')
 
+#---------------------------- writing to output csv file
 dfJoined.to_csv(outputfile)
