@@ -6,18 +6,24 @@ import time
 import requests
 import zipfile
 import os
-### path declaration with ending "/"
+#----------------------------------- path declaration with ending "/"
 if len(sys.argv) <= 4:
 	print("Output Directory path missing")
 	print("python downloadFile.py XvX dtF2 dtF1 DownloadDirectory\\")
-	exit(1)
+	sys.exit()
 xvx=sys.argv[1].lower()
 dtF2=sys.argv[2]
 dtF1=sys.argv[3]
-data_path=sys.argv[4]
+if sys.argv[4][-1] == '/' or sys.argv[4][-1] == '\\':
+	data_path = sys.argv[4]
+else:
+	data_path = sys.argv[4] + "/"
 givenF2Date=datetime.datetime.strptime(dtF2,"%d%m%Y")
 givenF1Date=datetime.datetime.strptime(dtF1,"%d%m%Y")
-### function definitions
+
+# print data_path,givenF2Date,givenF1Date,xvx
+# sys.exit()
+#----------------------------------- date & url function definitions
 def latestWeekdayDate(givenDate):
 	if givenDate.isoweekday() == 6 or givenDate.isoweekday() == 7:
 		cur_weekday=givenDate.isoweekday()
@@ -44,48 +50,38 @@ def dt2BSEURL(givenDate):
 	bseZipURL="https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_"+dateBSE+".zip"
 	return bseZipURL;
 
-### Setting Filenames to be downloaded
-dtF22=latestWeekdayDate(givenF2Date)
-dtF11=latestWeekdayDate(givenF1Date)
+#----------------------------------- Get URL and file names
+def getNames(dt,exc):
+	if exc == 'b':
+		latestDate=dt2BSEdt(latestWeekdayDate(dt))
+		ZipURL=dt2BSEURL(latestWeekdayDate(dt))
+		ZIPFile=data_path+"EQ_ISINCODE_"+latestDate+".zip"
+		CsvFile=ZIPFile.replace(".zip","")
+	elif exc == 'n':
+		latestDate=dt2NSEdt(latestWeekdayDate(dt))
+		ZipURL=dt2NSEURL(latestWeekdayDate(dt))
+		ZIPFile=data_path+"cm"+latestDate+"bhav.csv.zip"
+		CsvFile=ZIPFile.replace(".zip","")
+	return (ZipURL,ZIPFile,CsvFile)
 
-if xvx[0] == 'b':
-	latestF2date=dt2BSEdt(dtF22)
-	F2ZipURL=dt2BSEURL(dtF22)
-	F2ZIPFile=data_path+"EQ_ISINCODE_"+latestF2date+".zip"
-	F2CsvFile=F2ZIPFile.replace(".zip","")
-elif xvx[0] == 'n':
-	latestF2date=dt2NSEdt(dtF22)
-	F2ZipURL=dt2NSEURL(dtF22)
-	F2ZIPFile=data_path+"cm"+latestF2date+"bhav.csv.zip"
-	F2CsvFile=F2ZIPFile.replace(".zip","")
-if xvx[2] == 'b':
-	latestF1date=dt2BSEdt(dtF11)
-	F1ZipURL=dt2BSEURL(dtF11)
-	F1ZIPFile=data_path+"EQ_ISINCODE_"+latestF1date+".zip"
-	F1CsvFile=F1ZIPFile.replace(".zip","")
-elif xvx[2] == 'n':
-	latestF1date=dt2NSEdt(dtF11)
-	F1ZipURL=dt2NSEURL(dtF11)
-	F1ZIPFile=data_path+"cm"+latestF1date+"bhav.csv.zip"
-	F1CsvFile=F1ZIPFile.replace(".zip","")
+#----------------------------------- Download files and then extract to csv
+def download_extract(ZipURL,ZIPFile,CsvFile):
+	# downloading
+	r = requests.get(ZipURL, stream = True)
+	with open(ZIPFile,"wb") as zipFile:
+		for chunk in r.iter_content(chunk_size=1024):
+			# writing one chunk at a time to zip file
+			if chunk:
+				zipFile.write(chunk)
+	# Extract zip to csv
+	with zipfile.ZipFile(ZIPFile,"r") as zip_ref:
+		zip_ref.extractall(CsvFile)
+	fullCsvFile=CsvFile+"/"+os.listdir(CsvFile)[-1]	
+	return fullCsvFile
 
-### Download files
-r = requests.get(F2ZipURL, stream = True)
-with open(F2ZIPFile,"wb") as zipFile:
-	for chunk in r.iter_content(chunk_size=1024):
-		# writing one chunk at a time to zip file
-		if chunk:
-			zipFile.write(chunk)
-r = requests.get(F1ZipURL, stream = True)
-with open(F1ZIPFile,"wb") as zipFile:
-	for chunk in r.iter_content(chunk_size=1024):
-		# writing one chunk at a time to zip file
-		if chunk:
-			zipFile.write(chunk)
-with zipfile.ZipFile(F2ZIPFile,"r") as zip_ref:
-		zip_ref.extractall(F2CsvFile)
-with zipfile.ZipFile(F1ZIPFile,"r") as zip_ref:
-		zip_ref.extractall(F1CsvFile)
-F2CsvFile=F2CsvFile+"/"+os.listdir(F2CsvFile)[-1]
-F1CsvFile=F1CsvFile+"/"+os.listdir(F1CsvFile)[-1]
-print(F2CsvFile+" "+F1CsvFile)
+#-------------------- Main -------------------------
+f2URL,f2ZipFIle,F2CsvFIle=getNames(givenF2Date,xvx[0])
+f2=download_extract(f2URL,f2ZipFIle,F2CsvFIle)
+f1URL,f1ZipFIle,F1CsvFIle=getNames(givenF1Date,xvx[2])
+f1=download_extract(f1URL,f1ZipFIle,F1CsvFIle)
+print(f2+" "+f1)
