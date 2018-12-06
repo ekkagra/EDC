@@ -7,7 +7,7 @@ import numpy as np
 #filename=sys.argv[1]
 if len(sys.argv)<6:
 	print("Insufficient arguments")
-	print("python NSEvsBSE.py FileToKeepFully.csv SomeKeep.csv out.csv lookup outputCol1 outputCol2...")
+	print("python NSEvsBSE.py FileToKeepFully.csv SomeKeep.csv [out.xlsx | out.csv] lookup outputCol1 outputCol2...")
 	sys.exit()
 else:
 	input1file=sys.argv[2]		## input1file is SECOND argument
@@ -47,6 +47,15 @@ outputColumns.append(lookupColFile1)
 print(outputColumns)
 #---------------------------- Left Join of df2 with df1
 dfJoined=df2.join(df1[outputColumns].set_index(lookupColFile1),how='inner', on=lookupColFile2,lsuffix='_2', rsuffix='_1')
+dfJoined['Chnge']=(dfJoined['CLOSE_2']-dfJoined['CLOSE_1'])*100/dfJoined['CLOSE_1']
+dfSorted=dfJoined.sort_values('Chnge',ascending=False)
+# dfSorted.loc[dfSorted.SC_GROUP == 'A '].head(50)
+# dfSorted.loc[dfSorted.SERIES == 'EQ'].head(50)
 
-#---------------------------- writing to output csv file
-dfJoined.to_csv(outputfile)
+#---------------------------- writing to output csv/xlsx file
+if outputfile.split('.')[-1] == 'csv':
+	dfSorted.to_csv(outputfile)
+elif outputfile.split('.')[-1] == 'xlsx':
+	writer = pd.ExcelWriter(outputfile)
+	dfSorted.to_excel(writer,'Sorted')
+	writer.save()
